@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  setup-dynamodb:
+    image: amazon/aws-cli:2.28.25
+    volumes:
+      - ./build/setup-dynamodb.sh:/setup-dynamodb.sh
+    entrypoint: /bin/sh -c
+    command: >
+      "AWS_DEFAULT_REGION=ap-southeast-1
+      AWS_ACCESS_KEY_ID=test
+      AWS_SECRET_ACCESS_KEY=test
+      AWS_ENDPOINT=http://dynamodb:8000
+      /setup-dynamodb.sh"
+
+  setup-aws:
+    image: amazon/aws-cli:2.28.25
+    volumes:
+      - ./build/setup-aws.sh:/setup-aws.sh
+    entrypoint: /bin/sh -c
+    command: >
+      "AWS_DEFAULT_REGION=ap-southeast-1
+      AWS_ACCESS_KEY_ID=test
+      AWS_SECRET_ACCESS_KEY=test
+      AWS_ENDPOINT=http://localstack:4566
+      /setup-aws.sh"
+
+networks:
+  default:
+    name: backend-network
