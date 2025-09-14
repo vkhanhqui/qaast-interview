@@ -78,7 +78,7 @@ func main() {
 	userRepo := repo.NewUserRepo(pgPool)
 	userSvc := service.NewUserService(userRepo, env.JwtSecret)
 	userSvc = service.NewUserServiceSQS(userSvc, sqsAWSConfig, env.SQSUserLogsQueueURL)
-	userController := transport.NewUserController(r, userSvc, env.JwtSecret)
+	userController := transport.NewUserController(r, userSvc)
 	userController.RegisterRoutes()
 
 	userLogRepo := repo.NewLogRepo(dynamodbAWSConfig, env.DynamoTable)

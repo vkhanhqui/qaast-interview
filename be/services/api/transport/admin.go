@@ -2,7 +2,6 @@ package transport
 
 import (
 	"api/service"
-	"encoding/json"
 	"net/http"
 
 	"be/pkg/errors"
@@ -64,7 +63,7 @@ func (uc *AdminController) listUserLogs(w http.ResponseWriter, r *http.Request) 
 
 func (uc *AdminController) updateUser(w http.ResponseWriter, r *http.Request) {
 	var input AdminUpdateUserInput
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+	if err := input.Bind(r); err != nil {
 		pkghttp.JSON(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}

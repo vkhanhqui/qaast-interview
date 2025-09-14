@@ -2,6 +2,10 @@ package transport
 
 import (
 	"be/pkg/model"
+	"encoding/json"
+	"errors"
+	"net/http"
+	"net/mail"
 	"net/url"
 	"strconv"
 	"time"
@@ -58,6 +62,18 @@ type AdminUpdateUserInput struct {
 	ID    string `json:"id"`
 	Email string `json:"email"`
 	Name  string `json:"name"`
+}
+
+func (req *AdminUpdateUserInput) Bind(r *http.Request) error {
+	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		return err
+	}
+
+	if _, err := mail.ParseAddress(req.Email); err != nil {
+		return errors.New("invalid email format")
+	}
+
+	return nil
 }
 
 type AdminUpdateUserResponse struct {
