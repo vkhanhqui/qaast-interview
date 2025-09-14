@@ -1,9 +1,8 @@
 package service
 
 import (
-	repo "api/repository"
+	"api/store"
 	"be/pkg/errors"
-	"be/pkg/model"
 	"context"
 	"time"
 
@@ -14,15 +13,14 @@ import (
 type UserService interface {
 	SignUp(ctx context.Context, email, password string) (string, error)
 	SignIn(ctx context.Context, email, password string) (string, string, error)
-	UpdateUser(ctx context.Context, userID, email, name string) (*model.User, error)
 }
 
 type userService struct {
-	users  repo.UserRepository
+	users  store.UserRepository
 	jwtKey []byte
 }
 
-func NewUserService(u repo.UserRepository, secret string) UserService {
+func NewUserService(u store.UserRepository, secret string) UserService {
 	return &userService{users: u, jwtKey: []byte(secret)}
 }
 
@@ -59,8 +57,4 @@ func (s *userService) SignIn(ctx context.Context, email, password string) (strin
 
 	ss, err := token.SignedString(s.jwtKey)
 	return ss, u.ID, err
-}
-
-func (s *userService) UpdateUser(ctx context.Context, userID, email, name string) (*model.User, error) {
-	return s.users.UpdateUser(ctx, userID, email, name)
 }

@@ -4,7 +4,7 @@ import (
 	"be/pkg/events"
 	"be/pkg/model"
 	"context"
-	repo "worker/repository"
+	"worker/store"
 )
 
 type LogService interface {
@@ -12,15 +12,15 @@ type LogService interface {
 }
 
 type logService struct {
-	repo repo.LogRepository
+	logRepo store.LogRepository
 }
 
-func NewLogService(r repo.LogRepository) LogService {
-	return &logService{repo: r}
+func NewLogService(r store.LogRepository) LogService {
+	return &logService{logRepo: r}
 }
 
 func (s *logService) Write(ctx context.Context, ev events.UserLogsEvent) error {
-	return s.repo.Write(ctx, model.UserLogs{
+	return s.logRepo.Write(ctx, model.UserLogs{
 		UserID:    ev.UserID,
 		EventType: ev.EventType,
 		Details:   ev.Details,

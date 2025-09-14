@@ -1,8 +1,8 @@
 package main
 
 import (
-	repo "api/repository"
 	"api/service"
+	"api/store"
 	"api/transport"
 	"be/pkg/config"
 	"context"
@@ -75,14 +75,15 @@ func main() {
 		ExposedHeaders: []string{"Link"},
 	}))
 
-	userRepo := repo.NewUserRepo(pgPool)
+	userLogsSQS := store.NewUserLogsSQS(sqsAWSConfig, env.SQSUserLogsQueueURL)
+	userRepo := store.NewUserRepo(pgPool)
 	userSvc := service.NewUserService(userRepo, env.JwtSecret)
-	userSvc = service.NewUserServiceSQS(userSvc, sqsAWSConfig, env.SQSUserLogsQueueURL)
+	userSvc = service.NewUserServiceWithQueue(userSvc, userLogsSQS)
 	userController := transport.NewUserController(r, userSvc)
 	userController.RegisterRoutes()
 
-	userLogRepo := repo.NewLogRepo(dynamodbAWSConfig, env.DynamoTable)
-	adminSvc := service.NewAdminService(userRepo, userLogRepo)
+	userLogRepo := store.NewLogRepo(dynamodbAWSConfig, env.DynamoTable)
+	adminSvc := service.NewAdminService(userRepo, userLogRepo, userLogsSQS)
 	adminControler := transport.NewAdminController(r, userSvc, adminSvc, env.JwtSecret)
 	adminControler.RegisterRoutes()
 

@@ -1,10 +1,9 @@
-package repository
+package store
 
 import (
 	"be/pkg/errors"
 	"be/pkg/model"
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -37,7 +36,7 @@ func (r *logRepo) Write(ctx context.Context, l model.UserLogs) error {
 
 	item := map[string]ddbtypes.AttributeValue{
 		"PK":         &ddbtypes.AttributeValueMemberS{Value: "logs"},
-		"SK":         &ddbtypes.AttributeValueMemberS{Value: fmt.Sprintf("%s#%s", l.UserID, id)},
+		"SK":         &ddbtypes.AttributeValueMemberS{Value: id.String()},
 		"user_id":    &ddbtypes.AttributeValueMemberS{Value: l.UserID},
 		"event_type": &ddbtypes.AttributeValueMemberS{Value: l.EventType},
 		"details":    &ddbtypes.AttributeValueMemberS{Value: l.Details},

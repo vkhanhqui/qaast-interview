@@ -5,8 +5,8 @@ import (
 	"be/pkg/log"
 	"be/pkg/transport/sqs"
 	"context"
-	"worker/repository"
 	"worker/service"
+	"worker/store"
 	"worker/transport"
 
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
@@ -48,7 +48,7 @@ func main() {
 		panic(err)
 	}
 
-	r := repository.NewLogRepo(dynamodbAWSConfig, env.DynamoTable)
+	r := store.NewLogRepo(dynamodbAWSConfig, env.DynamoTable)
 	svc := service.NewLogService(r)
 
 	userLoggersHandler := transport.NewHandler(svc)

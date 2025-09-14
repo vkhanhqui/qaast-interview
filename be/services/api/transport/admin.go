@@ -62,13 +62,18 @@ func (uc *AdminController) listUserLogs(w http.ResponseWriter, r *http.Request) 
 }
 
 func (uc *AdminController) updateUser(w http.ResponseWriter, r *http.Request) {
+	adminID := pkghttp.GetUserID(w, r)
+	if adminID == "" {
+		return
+	}
+
 	var input AdminUpdateUserInput
 	if err := input.Bind(r); err != nil {
 		pkghttp.JSON(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
 
-	u, err := uc.userSvc.UpdateUser(r.Context(), input.ID, input.Email, input.Name)
+	u, err := uc.adminSvc.UpdateUser(r.Context(), adminID, input.ID, input.Email, input.Name)
 	if err != nil {
 		status := http.StatusInternalServerError
 		if errors.IsInvalid(err) {
