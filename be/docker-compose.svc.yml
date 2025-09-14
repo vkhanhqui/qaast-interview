@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    container_name: api
+    ports:
+      - '8080:8080'
+
+  worker:
+    build:
+      context: .
+      dockerfile: services/worker/Dockerfile
+    container_name: worker
+
+  wait-for-svc:
+    image: alpine
+    volumes:
+      - ./build/wait-for.sh:/wait-for.sh:z
+    entrypoint: /bin/sh -c
+    command: >
+      "
+        /wait-for.sh api:8080
+      "
+
+networks:
+  default:
+    name: backend-network

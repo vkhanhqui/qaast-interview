@@ -11,4 +11,4 @@ compose-all:
 	docker-compose -f docker-compose.svc.yml run -T wait-for-svc
 
 compose-down:
-	@docker-compose -f docker-compose.yml down -t 10 --remove-orphans
+	@docker-compose -f docker-compose.yml -f docker-compose.seed.yml -f docker-compose.svc.yml down -t 10 --remove-orphans
