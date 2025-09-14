@@ -69,6 +69,10 @@ func (req *AdminUpdateUserInput) Bind(r *http.Request) error {
 		return err
 	}
 
+	if len(req.Email) == 0 {
+		return nil
+	}
+
 	if _, err := mail.ParseAddress(req.Email); err != nil {
 		return errors.New("invalid email format")
 	}
