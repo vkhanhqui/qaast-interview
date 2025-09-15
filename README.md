@@ -13,7 +13,7 @@
 
 ## Project structure
 
-My project follows monorepo structure:
+My backend project follows monorepo structure:
 ```
 .
 ├── pkg                    # Shared packages
@@ -26,6 +26,12 @@ My project follows monorepo structure:
         ├── store          # Database or third party callers
         └── main.go        # Trigger point
 ```
+
+Techstack:
+- Backend: golang, chi
+- Frontend: nextjs, typescript
+- Database: postgresql, dynamodb
+- Message queue: AWS SQS
 
 Note: In this assignment, I mainly focused on the backend code. For the UI, I used ChatGPT to quickly generate interfaces that fit the API endpoints. As a result, the project structure and code of the frontend may not follow best practices.
 
