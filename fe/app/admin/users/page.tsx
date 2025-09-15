@@ -38,6 +38,7 @@ export default function AdminUsersPage() {
     if (!data.users || !data.next_cursor) {
       setIsLastPage(true);
       setErrorMsg("This is the last page.");
+      setUsers(data.users || []);
       return;
     }
     setUsers(data.users || []);
@@ -94,11 +95,36 @@ export default function AdminUsersPage() {
         const text = await res.text();
         throw new Error(text || "Update failed");
       }
-      // refresh after successful update
       fetchUsers(currentCursor || undefined);
       setErrorMsg("");
     } catch (err: any) {
       setErrorMsg(err.message || "Update failed");
+    }
+  }
+
+  async function deleteUser(id: string) {
+    if (!token) return;
+    if (!confirm("Are you sure you want to delete this user?")) return;
+
+    try {
+      const res = await fetch("http://localhost:8080/admin/users", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Delete failed");
+      }
+      // Refresh list after delete
+      fetchUsers(currentCursor || undefined);
+      setErrorMsg("");
+    } catch (err: any) {
+      setErrorMsg(err.message || "Delete failed");
     }
   }
 
@@ -142,6 +168,7 @@ export default function AdminUsersPage() {
               <th className="border px-4 py-2">Email</th>
               <th className="border px-4 py-2">Name</th>
               <th className="border px-4 py-2">Created At</th>
+              <th className="border px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -176,6 +203,14 @@ export default function AdminUsersPage() {
                 </td>
                 <td className="border px-4 py-2">
                   {new Date(u.created_at).toLocaleString()}
+                </td>
+                <td className="border px-4 py-2 text-center">
+                  <button
+                    onClick={() => deleteUser(u.id)}
+                    className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}

@@ -18,6 +18,7 @@ type UserRepository interface {
 	FindByEmail(ctx context.Context, email string) (*model.User, error)
 	UpdateUser(ctx context.Context, id, email, name string) (*model.User, error)
 	List(ctx context.Context, limit int, cursor string) ([]model.User, error)
+	DeleteUser(ctx context.Context, id string) error
 }
 
 type userRepo struct {
@@ -106,4 +107,20 @@ func (r *userRepo) List(ctx context.Context, limit int, cursor string) ([]model.
 		users = append(users, u)
 	}
 	return users, errors.WithStack(rows.Err())
+}
+
+func (r *userRepo) DeleteUser(ctx context.Context, id string) error {
+	res, err := r.db.Exec(ctx, `
+        DELETE FROM users
+        WHERE id = $1
+    `, id)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	if res.RowsAffected() == 0 {
+		return errors.WithNotFound(errors.New("User not found"), "")
+	}
+
+	return nil
 }

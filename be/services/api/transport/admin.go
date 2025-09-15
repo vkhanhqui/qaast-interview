@@ -2,6 +2,7 @@ package transport
 
 import (
 	"api/service"
+	"encoding/json"
 	"net/http"
 
 	"be/pkg/errors"
@@ -26,6 +27,7 @@ func (uc *AdminController) RegisterRoutes() {
 		r.Use(pkghttp.AuthMiddleware(uc.jwtKey))
 		r.Get("/admin/users", uc.listUsers)
 		r.Put("/admin/users", uc.updateUser)
+		r.Delete("/admin/users", uc.deleteUser)
 
 		r.Get("/admin/userlogs", uc.listUserLogs)
 	})
@@ -89,4 +91,32 @@ func (uc *AdminController) updateUser(w http.ResponseWriter, r *http.Request) {
 	res := AdminUpdateUserResponse{}
 	res.Bind(u)
 	pkghttp.JSON(w, http.StatusOK, res)
+}
+
+func (uc *AdminController) deleteUser(w http.ResponseWriter, r *http.Request) {
+	adminID := pkghttp.GetUserID(w, r)
+	if adminID == "" {
+		return
+	}
+
+	var input AdminDeleteUserInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		pkghttp.JSON(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	err := uc.adminSvc.DeleteUser(r.Context(), adminID, input.ID)
+	if err != nil {
+		status := http.StatusInternalServerError
+		if errors.IsInvalid(err) {
+			status = http.StatusBadRequest
+		}
+		if errors.IsNotFound(err) {
+			status = http.StatusNotFound
+		}
+		pkghttp.JSON(w, status, ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	pkghttp.JSON(w, http.StatusNoContent, "")
 }

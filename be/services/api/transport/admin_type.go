@@ -132,3 +132,7 @@ func (res *AdminListUserLogsResponse) Bind(userlogs []model.UserLogs, nextCursor
 
 	res.NextCursor = nextCursor
 }
+
+type AdminDeleteUserInput struct {
+	ID string `json:"id"`
+}

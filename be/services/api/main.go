@@ -83,7 +83,8 @@ func main() {
 	userController.RegisterRoutes()
 
 	userLogRepo := store.NewLogRepo(dynamodbAWSConfig, env.DynamoTable)
-	adminSvc := service.NewAdminService(userRepo, userLogRepo, userLogsSQS)
+	adminSvc := service.NewAdminService(userRepo, userLogRepo)
+	adminSvc = service.NewAdminServiceWithQueue(adminSvc, userLogsSQS)
 	adminControler := transport.NewAdminController(r, userSvc, adminSvc, env.JwtSecret)
 	adminControler.RegisterRoutes()
 
